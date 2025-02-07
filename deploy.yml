@@ -1,0 +1,20 @@
+- name: Deploy Flask App
+  hosts: web
+  become: true
+  tasks:
+    - name: Install Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Start Docker Service
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Pull Docker Image
+      command: docker pull {{ lookup('env', 'DOCKERHUB_USERNAME') }}/flask-app:latest
+
+    - name: Run Docker Container
+      command: docker run -d -p 5000:5000 --name flask-app {{ lookup('env', 'DOCKERHUB_USERNAME') }}/flask-app:latest
