@@ -1,3 +1,12 @@
+terraform {
+  backend "s3" {
+    bucket         = "juls-devops-training-nyar"
+    key            = "terraform/terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+   }
+}
+
 provider "aws" {
   region = "us-east-1"
 }
@@ -5,7 +14,7 @@ provider "aws" {
 resource "aws_instance" "flask_app" {
   ami           = "ami-085ad6ae776d8f09c"
   instance_type = "t2.micro"
-  # key_name      = aws_key_pair.flask_key.key_name # Ensure SSH key is used
+  key_name      = aws_key_pair.flask_key.key_name # Ensure SSH key is used
 
   tags = {
     Name = "flask-app-instance-juls"
