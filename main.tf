@@ -4,7 +4,7 @@ provider "aws" {
 
 resource "aws_key_pair" "flask_key" {
   key_name   = "jv-key"
-  public_key = file("jv-key.pub") # Ensure this file exists
+  public_key = file("/home/ec2-user/devops-activity/jv-key.pub") # Ensure this file exists
 }
 
 resource "aws_instance" "flask_app" {
