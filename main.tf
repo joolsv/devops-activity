@@ -14,7 +14,7 @@ resource "aws_instance" "flask_app" {
   # Connection block required for provisioners
   connection {
     type        = "ssh"
-    user        = "root"
+    user        = "ec2-user"
     private_key = file("/root/.ssh/jv-key")
     host        = self.public_ip
   }
