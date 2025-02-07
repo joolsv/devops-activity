@@ -25,13 +25,14 @@ data "aws_security_group" "existing_sg" {
 # Lookup an existing subnet inside the VPC
 data "aws_subnet" "existing_subnet" {
   vpc_id = data.aws_vpc.existing_vpc.id
+  availability_zone = "us-east-1b"  
 }
 
 resource "aws_instance" "flask_app" {
   ami                    = "ami-085ad6ae776d8f09c"
   instance_type          = "t2.micro"
   vpc_security_group_ids = [data.aws_security_group.existing_sg.id] # Dynamically fetch SG ID
-  subnet_id              = data.aws_subnet.existing_subnet.id       # Automatically get a subnet
+  subnet_id              = tolist(data.aws_subnets.existing_subnets.ids)[0]     # Automatically get a subnet
 
   tags = {
     Name = "flask-app-instance-juls"
