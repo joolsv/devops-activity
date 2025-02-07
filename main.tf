@@ -33,6 +33,7 @@ resource "aws_instance" "flask_app" {
   instance_type          = "t2.micro"
   vpc_security_group_ids = [data.aws_security_group.existing_sg.id]
   subnet_id              = data.aws_subnet.us_east_1b_subnet.id # Use us-east-1b subnet
+  iam_instance_profile   = "FT-EC2-Role"
 
   tags = {
     Name = "flask-app-instance-juls"
