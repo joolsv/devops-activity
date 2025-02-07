@@ -15,13 +15,13 @@ resource "aws_instance" "flask_app" {
   connection {
     type        = "ssh"
     user        = "root"
-    private_key = file("~/.ssh/jv-key")
+    private_key = file("/root/.ssh/jv-key")
     host        = self.public_ip
   }
 
   provisioner "file" {
     source      = "../ansible"
-    destination = "/home/ec2-user/ansible"
+    destination = "/home/ec2-user/"
   }
 }
 
