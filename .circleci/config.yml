@@ -1,0 +1,99 @@
+version: 2.1
+
+executors:
+  python-executor:
+    docker:
+      - image: circleci/python:3.10
+    working_directory: ~/project
+
+  docker-executor:
+    docker:
+      - image: circleci/docker:latest
+    working_directory: ~/project
+
+  terraform-executor:
+    docker:
+      - image: hashicorp/terraform:latest
+    working_directory: ~/project
+
+  ansible-executor:
+    docker:
+      - image: williamyeh/ansible:latest
+    working_directory: ~/project
+
+jobs:
+  build-and-test:
+    executor: python-executor
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            python -m venv venv
+            source venv/bin/activate
+            pip install -r requirements.txt
+      - run:
+          name: Run tests
+          command: |
+            source venv/bin/activate
+            pytest tests/
+
+  build-docker-image:
+    executor: docker-executor
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker Image
+          command: docker build -t $DOCKERHUB_USERNAME/flask-app:latest .
+      - run:
+          name: Log in to Docker Hub
+          command: echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      - run:
+          name: Push Docker Image
+          command: docker push $DOCKERHUB_USERNAME/flask-app:latest
+
+  deploy-terraform:
+    executor: terraform-executor
+    steps:
+      - checkout
+      - run:
+          name: Initialize Terraform
+          command: |
+            cd terraform
+            terraform init
+      - run:
+          name: Apply Terraform
+          command: |
+            cd terraform
+            terraform apply -auto-approve
+
+  deploy-ansible:
+    executor: ansible-executor
+    steps:
+      - checkout
+      - run:
+          name: Install SSH key
+          command: |
+            echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+      - run:
+          name: Run Ansible Playbook
+          command: |
+            cd ansible
+            ansible-playbook -i inventory.ini deploy.yml
+
+workflows:
+  version: 2
+  deploy-app:
+    jobs:
+      - build-and-test
+      - build-docker-image:
+          requires:
+            - build-and-test
+      - deploy-terraform:
+          requires:
+            - build-docker-image
+      - deploy-ansible:
+          requires:
+            - deploy-terraform
