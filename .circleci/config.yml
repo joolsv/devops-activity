@@ -18,7 +18,7 @@ executors:
 
   ansible-executor:
     docker:
-      - image: williamyeh/ansible:latest
+      - image: geerlingguy/docker-ubuntu2004-ansible:latest
     working_directory: ~/project
 
 jobs:
