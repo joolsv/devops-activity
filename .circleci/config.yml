@@ -13,7 +13,7 @@ executors:
 
   terraform-executor:
     docker:
-      - image: cimg/base:stable
+      - image: hashicorp/terraform:1.5.7
     working_directory: ~/project
 
   ansible-executor:
