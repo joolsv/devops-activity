@@ -36,7 +36,7 @@ jobs:
           name: Run tests
           command: |
             source venv/bin/activate
-            pytest tests/
+            pytest
 
   build-docker-image:
     executor: docker-executor
