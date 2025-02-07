@@ -27,7 +27,7 @@ resource "aws_instance" "flask_app" {
   # provisioner "file" {
   #  source      = "../ansible"
   #  destination = "/home/ec2-user/"
-  }
+  # }
 }
 
 output "ec2_public_ip" {
