@@ -60,9 +60,9 @@ jobs:
       - run:
           name: Terraform Plan
           command: |
-            terraform plan
+	    terraform plan
       - run:
-          name: Terraform Apply
+          name: Apply Terraform
           command: |
             terraform apply -auto-approve
 
@@ -71,43 +71,17 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install AWS CLI, Curl & SSM Plugin
-          command: |
-            apt update -y
-            apt install -y awscli curl
-            curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
-            dpkg -i session-manager-plugin.deb
-            session-manager-plugin --version
+          name: Install SSH
+          command: apt-get update && apt-get install -y openssh-client
       - run:
-          name: Run Ansible Playbook via AWS SSM
+          name: Install SSH key
           command: |
-            COMMAND_ID=$(aws ssm send-command \
-              --document-name "AWS-RunShellScript" \
-              --targets Key=instanceIds,Values=i-06dd3c36ac4759973 \
-              --parameters "commands=['cd /home/ec2-user && ansible-playbook -i inventory.ini deploy.yml -vvv || echo PLAYBOOK_FAILED']" \
-              --region us-east-1 \
-              --query "Command.CommandId" --output text)
-
-            echo "Waiting for Ansible Playbook Execution..."
-          
-            while true; do
-              STATUS=$(aws ssm list-command-invocations \
-                --command-id "$COMMAND_ID" \
-                --details \
-                --query "CommandInvocations[0].Status" \
-                --output text --region us-east-1)
-
-              echo "Current status: $STATUS"
-            
-              if [[ "$STATUS" == "Success" ]]; then
-                echo "Ansible Playbook Executed Successfully!"
-                break
-              elif [[ "$STATUS" == "Failed" || "$STATUS" == "TimedOut" ]]; then
-                echo "Ansible Playbook Execution Failed."
-                exit 1
-              fi
-              sleep 5
-            done
+            echo "$EC2_SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+      - run:
+          name: Run Ansible Playbook
+          command: |
+            ansible-playbook -i inventory.ini deploy.yml
 
 workflows:
   version: 2

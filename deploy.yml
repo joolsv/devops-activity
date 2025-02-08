@@ -3,20 +3,20 @@
   become: true
   tasks:
     - name: Install Docker
-      ansible.builtin.dnf:
+      ansible.builtin.yum:
         name: docker
-        state: latest
+        state: present
 
     - name: Start Docker Service
-      service:
+      ansible.builtin.service:
         name: docker
         state: started
         enabled: true
 
     - name: Pull Docker Image
-      command: |
-        docker pull joolsv/flask-app:latest
+      ansible.builtin.command: docker pull {{ lookup('env', 'DOCKERHUB_USERNAME') }}/flask-app:latest
+      changed_when: false
 
     - name: Run Docker Container
-      command: |
-        docker run -d -p 5000:5000 --name flask-app joolsv/flask-app:latest
+      ansible.builtin.command: docker run -d -p 5000:5000 --name flask-app {{ lookup('env', 'DOCKERHUB_USERNAME') }}/flask-app:latest
+      changed_when: false
