@@ -60,7 +60,7 @@ resource "aws_instance" "flask_app" {
 set -e
 
 if ! command -v aws &> /dev/null; then
-    dnf update -y && dnf install aws-cli -y
+    dnf update -y && dnf install aws-cli ansible -y
 fi
 
 aws s3 cp s3://${aws_s3_bucket.ssm_files.id}/inventory.ini /home/ec2-user/inventory.ini
