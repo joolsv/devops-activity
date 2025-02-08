@@ -79,6 +79,10 @@ jobs:
             echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
       - run:
+          name: Add Host to Known Hosts
+          command: |
+            ssh-keyscan -H 54.234.61.185 >> ~/.ssh/known_hosts
+      - run:
           name: Run Ansible Playbook
           command: |
             ansible-playbook -i inventory.ini deploy.yml
