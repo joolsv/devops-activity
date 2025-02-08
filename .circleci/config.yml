@@ -71,12 +71,20 @@ jobs:
           name: Install SSH
           command: apt-get update && apt-get install -y openssh-client
       - run:
-          name: Install SSH key
+          name: Setup and Install SSH key
           command: |
-            echo "$EC2_SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+            mkdir -p ~/.ssh
+            chmod 700 ~/.ssh
+            touch ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts
+            ssh-keyscan -H 54.242.228.217 2>/dev/null >> ~/.ssh/known_hosts
+            echo "$EC2_SSH_KEY" | sed 's/\r$//' > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
       - run:
-          name: Verify Ansible Installation
+          name: Verify SSH Connection
+          ssh -i ~/.ssh/id_rsa ec2-user@54.242.228.217 "echo 'SSH is working'"
+      - run:
+          name: Verify Ansible
           command: ansible --version
       - run:
           name: Run Ansible Playbook
