@@ -11,7 +11,7 @@ executors:
 
   terraform-executor:
     docker:
-      - image: hashicorp/terraform:1.5.7
+      - image: hashicorp/terraform:1.8.1
 
   ansible-executor:
     docker:
@@ -77,12 +77,12 @@ jobs:
             chmod 700 ~/.ssh
             touch ~/.ssh/known_hosts
             chmod 644 ~/.ssh/known_hosts
-            ssh-keyscan -H 54.242.228.217 2>/dev/null >> ~/.ssh/known_hosts
+            ssh-keyscan -H $EC2_PUBLIC_IP 2>/dev/null >> ~/.ssh/known_hosts
             echo "$EC2_SSH_KEY" | sed 's/\r$//' > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
       - run:
           name: Verify SSH Connection
-          command: ssh -i ~/.ssh/id_rsa ec2-user@54.242.228.217 "echo 'SSH is working'"
+          command: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$EC2_PUBLIC_IP "echo 'SSH is working'"
       - run:
           name: Verify Ansible
           command: ansible --version
