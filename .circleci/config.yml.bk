@@ -71,10 +71,13 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install AWS CLI & SSM Plugin
+          name: Install SSH
+          command: apt-get update && apt-get install -y openssh-client
+      - run:
+          name: Install SSH key
           command: |
-            apt update && sudo apt install -y awscli
-            aws ssm start-session --target i-0175556a936e573ec
+            echo "$EC2_SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
       - run:
           name: Run Ansible Playbook
           command: |
