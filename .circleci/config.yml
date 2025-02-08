@@ -83,7 +83,7 @@ jobs:
           command: |
             COMMAND_ID=$(aws ssm send-command \
               --document-name "AWS-RunShellScript" \
-              --targets Key=instanceIds,Values=i-0175556a936e573ec \
+              --targets Key=instanceIds,Values=i-06dd3c36ac4759973 \
               --parameters "commands=['cd /home/ec2-user && ansible-playbook -i inventory.ini deploy.yml -vvv || echo PLAYBOOK_FAILED']" \
               --region us-east-1 \
               --query "Command.CommandId" --output text)
