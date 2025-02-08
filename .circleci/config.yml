@@ -74,7 +74,7 @@ jobs:
           name: Install AWS CLI & SSM Plugin
           command: |
             apt update && sudo apt install -y awscli
-            aws ssm start-session --target i-0175556a936e573ec
+            aws ssm start-session --target i-0175556a936e573ec --region us-east-1
       - run:
           name: Run Ansible Playbook
           command: |
