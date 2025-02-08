@@ -25,6 +25,25 @@ data "aws_subnet" "us_east_1b_subnet" {
   availability_zone = "us-east-1b"
 }
 
+resource "aws_s3_bucket" "ssm_files" {
+  bucket = "juls-devops-training-files"
+  force_destroy = true
+}
+
+resource "aws_s3_object" "inventory_ini" {
+  bucket = aws_s3_bucket.ssm_files.id
+  key    = "inventory.ini"
+  source = "inventory.ini"
+  acl    = "private"
+}
+
+resource "aws_s3_object" "deploy_yml" {
+  bucket = aws_s3_bucket.ssm_files.id
+  key    = "deploy.yml"
+  source = "deploy.yml"
+  acl    = "private"
+}
+
 resource "aws_instance" "flask_app" {
   ami                    = "ami-085ad6ae776d8f09c"
   instance_type          = "t2.micro"
@@ -35,6 +54,20 @@ resource "aws_instance" "flask_app" {
   tags = {
     Name = "flask-app-instance-juls"
   }
+
+  user_data = <<EOF
+#!/bin/bash
+set -e
+
+if ! command -v aws &> /dev/null; then
+    dnf update -y && dnf install aws-cli -y
+fi
+
+aws s3 cp s3://${aws_s3_bucket.ssm_files.id}/inventory.ini /home/ec2-user/inventory.ini
+aws s3 cp s3://${aws_s3_bucket.ssm_files.id}/deploy.yml /home/ec2-user/deploy.yml
+
+chmod 644 /home/ec2-user/inventory.ini /home/ec2-user/deploy.yml
+EOF
 }
 
 output "ec2_public_ip" {
