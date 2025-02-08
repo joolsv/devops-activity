@@ -82,7 +82,7 @@ jobs:
             chmod 600 ~/.ssh/id_rsa
       - run:
           name: Verify SSH Connection
-          ssh -i ~/.ssh/id_rsa ec2-user@54.242.228.217 "echo 'SSH is working'"
+          command: ssh -i ~/.ssh/id_rsa ec2-user@54.242.228.217 "echo 'SSH is working'"
       - run:
           name: Verify Ansible
           command: ansible --version
