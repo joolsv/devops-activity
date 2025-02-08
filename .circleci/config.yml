@@ -55,16 +55,13 @@ jobs:
       - checkout
       - run:
           name: Initialize Terraform
-          command: |
-            terraform init
+          command: terraform init
       - run:
           name: Terraform Plan
-          command: |
-	    terraform plan
+          command: terraform plan
       - run:
           name: Apply Terraform
-          command: |
-            terraform apply -auto-approve
+          command: terraform apply -auto-approve
 
   deploy-ansible:
     executor: ansible-executor
@@ -79,9 +76,11 @@ jobs:
             echo "$EC2_SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
       - run:
+          name: Verify Ansible Installation
+          command: ansible --version
+      - run:
           name: Run Ansible Playbook
-          command: |
-            ansible-playbook -i inventory.ini deploy.yml
+          command: ansible-playbook -i inventory.ini deploy.yml
 
 workflows:
   version: 2
