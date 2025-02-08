@@ -71,9 +71,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install AWS CLI & SSM Plugin
+          name: Install AWS CLI, Curl & SSM Plugin
           command: |
-            apt update && sudo apt install -y awscli
+            apt update -y
+            apt install -y awscli curl
             curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
             dpkg -i session-manager-plugin.deb
             session-manager-plugin --version
