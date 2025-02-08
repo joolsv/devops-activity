@@ -15,13 +15,11 @@ data "aws_vpc" "existing_vpc" {
   id = "vpc-0ac15a8ab99f47d9e"
 }
 
-# Lookup existing Security Group inside the VPC
 data "aws_security_group" "existing_sg" {
   vpc_id = data.aws_vpc.existing_vpc.id
   name   = "manila-ops-devops-training-internal-and-secure-public"
 }
 
-# Lookup a specific subnet in us-east-1b
 data "aws_subnet" "us_east_1b_subnet" {
   vpc_id            = data.aws_vpc.existing_vpc.id
   availability_zone = "us-east-1b"
