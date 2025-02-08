@@ -79,11 +79,6 @@ jobs:
             dpkg -i session-manager-plugin.deb
             session-manager-plugin --version
       - run:
-          name: Install Python Packages (`boto3`, `botocore`, `ansible`)
-          command: |
-            pip3 install --upgrade pip
-            pip3 install boto3 botocore ansible
-      - run:
           name: Run Ansible Playbook via AWS SSM
           command: |
             aws ssm send-command \
