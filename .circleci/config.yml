@@ -74,15 +74,27 @@ jobs:
           name: Install AWS CLI, Curl & SSM Plugin
           command: |
             apt update -y
-            apt install -y awscli curl
+            apt install -y awscli curl python3-pip
             curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
             dpkg -i session-manager-plugin.deb
             session-manager-plugin --version
-            aws ssm start-session --target i-0175556a936e573ec --region us-east-1
       - run:
-          name: Run Ansible Playbook
+          name: Install Python Packages (`boto3`, `botocore`, `ansible`)
           command: |
-            ansible-playbook -i inventory.ini deploy.yml
+            pip3 install --upgrade pip
+            pip3 install boto3 botocore ansible
+      - run:
+          name: Run Ansible Playbook via AWS SSM
+          command: |
+            aws ssm send-command \
+              --document-name "AWS-RunShellScript" \
+              --targets Key=instanceIds,Values=i-0175556a936e573ec \
+              --parameters "commands=['ansible-playbook -i inventory.ini deploy.yml']" \
+              --region us-east-1
+      - run:
+          name: Check Ansible Execution Status
+          command: |
+            aws ssm list-command-invocations --region us-east-1
 
 workflows:
   version: 2
